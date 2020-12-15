@@ -1,6 +1,0 @@
- name: Build
-  uses: andstor/jsdoc-action@v1
-  with:
-    source_dir: ./JS
-    recurse: true
-    output_dir: ./Docs
