@@ -1,4 +1,8 @@
 /**
+ * @file Stellt Funktionen für Farben zur verfügung
+ * @module color.js
+ */
+/**
  * Konvertiert das Array zu einem String, in der Form rgb(r,g,b)
  * @param {number[3]} arr Die Farbe
  * @returns {string} Die Farbe
