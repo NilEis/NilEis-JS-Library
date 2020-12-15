@@ -1,0 +1,2 @@
+powershell -c "Invoke-WebRequest -Uri 'https://repo1.maven.org/maven2/com/google/javascript/closure-compiler/v20201207/closure-compiler-v20201207.jar' -OutFile 'closure-compiler-v20200719.jar'"
+powershell -c "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gpujs/gpu.js/master/dist/gpu-browser.min.js' -OutFile './JS/GPU/gpu-browser.min.js'"
