@@ -508,11 +508,21 @@ class canvasClass {
         }
     }
 
+    /**
+     * Gibt Text aus
+     * @param {string} str Der Text
+     * @param {string} color Die Textfarbe
+     */
     alert(str, color) {
         this.cls();
         this.fillText(WIDTH / 4, HEIGHT / 2, str, "50px Times New Roman", color);
     }
 
+    /**
+     * Aktualisiert die Größe des Canvas
+     * @param {number} w Breite
+     * @param {number} h Höhe
+     */
     resize(w, h) {
         this.canvas.setAttribute("width", w);
         this.canvas.setAttribute("height", h);

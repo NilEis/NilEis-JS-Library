@@ -1,3 +1,7 @@
+/**
+ * Lädt eine Datei als String
+ * @param {string} readFile Der Pfad und Name der Datei
+ */
 function getAsText(readFile) {
 
     const reader = new FileReader();

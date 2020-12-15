@@ -136,14 +136,24 @@ Number.prototype.pad = function (size) {
     }
     return s;
 }
-
+/**
+ * Gibt den Sinus von x zurück
+ * @param {number} x Der Wert in Radien
+ * @returns {number} Der Sinus von x
+ */
 function newSine(x) {
     return sineTable[Math.floor((x % 360) * 100)];
 }
+
 const sineTable = new Float32Array(36000);
 for (let i = 0; i < 36000; i++)
     sineTable[i] = Math.sin(i / 100);
 
+/**
+ * Gibt den Cosinus von x zurück
+ * @param {number} x Der Wert in Radien
+ * @returns {number} Der Cosinus von x
+ */
 function newCos(x) {
     return sineTable[Math.floor((x % 360) * 100)];
 }

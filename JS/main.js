@@ -48,17 +48,22 @@ function draw() {
     drawFPS();
     /*Zeichne
     --------------*/
-    
+
     /*--------------
      */
     calculateFPS();
     animationFrame = requestAnimationFrame(draw);
 }
-
+/**
+ * Stoppt alles
+ */
 function stop() {
     cancelAnimationFrame(animationFrame);
 }
 
+/**
+ * Zeichnet die FPS auf das Canvas
+ */
 function drawFPS() {
     c.fillText(WIDTH - 80, 25, "FPS: " + fps, "13px Times New Roman", "white");
     c.fillText(WIDTH - 80, 45, "Max. FPS: " + maxFPS, "13px Times New Roman", "white");
@@ -66,6 +71,9 @@ function drawFPS() {
     c.fillText(WIDTH - 80, 85, "TPF: " + frameTime, "13px Times New Roman", "white");
 }
 
+/**
+ * Berechnet die FPS
+ */
 function calculateFPS() {
     const now = performance.now();
     while (times.length > 0 && times[0] <= now - 1000) {
