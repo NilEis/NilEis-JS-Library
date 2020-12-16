@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - JS\draw\canvas.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>JS\draw\canvas.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">72.05</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">542</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">110.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">4.33</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">/**
+ * canvasClass ist eine Klasse, die das zugreifen auf das Canvas Objekt erleichtert.
+ * @file Stellt Methoden zum Zugriff auf das HTML5 Canvas zur verfügung
+ * @example
+ * let c = new canvasClass(&quot;canvas&quot;, w, h, &quot;green&quot;);
+ */
+class canvasClass {
+    /**
+     * Der Construktor der Funktion
+     * @param {string} elem Die Id des Elements in das das Canvas eingefügt werden soll.
+     * @param {string} canvas Der Name für für die Id des Canvas, welches der Constructor erzeugt.
+     * @param {number} width Die Breite des Canvas.
+     * @param {number} height Die Höhe des Canvas.
+     * @param {string} [color= &quot;&quot;] Die Hintergrundfarbe des Canvas.
+     * @example
+     * let c = new canvasClass(&quot;canvas&quot;, w, h, &quot;green&quot;);
+     */
+    constructor(elem, canvas, width, height, color = &quot;&quot;, ncanvas = null) {
+        let node = ncanvas === null ? document.createElement(&quot;canvas&quot;) : ncanvas;
+        node.setAttribute(&quot;id&quot;, canvas);
+        document.getElementById(elem).appendChild(node);
+        /**
+         * @member {canvas} canvasClass~canvas
+         */
+        this.canvas = document.getElementById(canvas);
+        this.canvas.setAttribute(&quot;width&quot;, width);
+        this.canvas.setAttribute(&quot;height&quot;, height);
+        this.aspectWidth = window.innerWidth / width;
+        this.aspectHeight = window.innerHeight / height;
+        /**
+         * @member {Context} canvasClass~ctx
+         */
+        this.ctx = this.canvas.getContext(&quot;2d&quot;);
+        this.canvas.style.backgroundColor = color;
+        /**
+         * @member {number} canvasClass~_rows
+         */
+        this._rows = 0;
+        /**
+         * @member {number} canvasClass~_columns
+         */
+        this._columns = 0;
+        /**
+         * @member {Array.&lt;{name:string,x:number,y:number,w:number,h:number, draw: function, update: function}&gt;|Array.&lt;{name:string,x:number,y:number,r:number, draw: function, update: function}&gt;} canvasClass~shapes
+         */
+        this.shapes = [];
+
+        /**
+         * @member {HTMLUListElement} canvasClass~listSh
+         */
+        this.listSh = document.createElement(&quot;ul&quot;);
+    }
+
+    /**
+     * Gibt die hintergrundfarbe zurück
+     * @type {string}
+     * @returns {string}    Die Farbe des Hintergrunds
+     * @example
+     * console.log(c.background);
+     */
+    get background() {
+        return this.canvas.style.backgroundColor;
+    }
+
+    /**
+     * Setzt die Hintergrundfarbe
+     * @param {string} c Die Farbe die als neuer Hintergrund gesetzt werden soll
+     * @example
+     * c.background = &quot;Blue&quot;;
+     */
+    set background(c) {
+        this.canvas.style.backgroundColor = c;
+    }
+
+    /**
+     * Gibt das HTMLElement zurück, in dem sich die Liste befindet
+     * @return {HTMLElement} Die Liste
+     */
+    get shapeList() {
+        return this.listSh;
+    }
+
+    get rows() {
+        return this._rows;
+    }
+
+    set rows(r) {
+        this._rows = r;
+    }
+
+    get columns() {
+        return this._columns;
+    }
+
+    set columns(r) {
+        this._columns = r;
+    }
+
+    /**
+     * Gibt die Breite des Canvas zurück
+     * @type {number}
+     * @returns {number} Die Breite des Canvas 
+     * @example
+     * console.log(c.width);
+     */
+    get width() {
+        return this.canvas.width;
+    }
+    /**
+     * Setzt eine neue Breite
+     * @param {number} w Die neue breite des Canvas
+     * @example
+     * c.width = 800;
+     */
+    set width(w) {
+        this.canvas.width = w;
+    }
+
+    /**
+     * Gibt die höhe des canvas zurück
+     * @type {number}
+     * @returns {number} Die Höhe des Canvas 
+     * @example
+     * console.log(c.height);
+     */
+    get height() {
+        return this.canvas.height;
+    }
+    /**
+     * Setzt eine neue Höhe für das Canvas
+     * @param h {number} Die neue höhe des Canvas
+     * @example
+     * c.height = 600;
+     */
+    set height(h) {
+        this.canvas.height = h;
+    }
+
+    mouseOnCanvas(mx, my) {
+        if (mx &lt; 0 || mx &gt; this.width || my &lt; 0 || my &gt; this.height)
+            return false;
+        else
+            return true;
+    }
+
+    /**
+     * 
+     * @param {{name:string,x:number,y:number,w:number,h:number, draw:function}|{name:string,x:number,y:number,r:number, draw:function}} shape Das was gezeichnet werden soll
+     */
+    addShape(shape) {
+        shape.id = this.shapes.length;
+        this.shapes.push(shape);
+        let tmp = document.createElement(&quot;li&quot;);
+        tmp.innerHTML = &quot;&lt;button onclick=&#039;delete c.shapes[&quot; + shape.id + &quot;];c.updateList()&#039;&gt;Remove&lt;/button&gt;&quot; + shape.toString();
+        this.listSh.appendChild(tmp);
+    }
+
+    /**
+     * Fügt einen Kreis zum Canvas hinzu
+     * @param {number} x x-Position
+     * @param {number} y y-Position
+     * @param {number} r Radius
+     * @param {string} color Die Farbe
+     */
+    addCircle(x, y, r, color = &quot;black&quot;) {
+        c.addShape({
+            name: &quot;Circle&quot;,
+            x: x,
+            y: y,
+            r: r,
+            color: color,
+            draw: function () {
+                c.fillCircle(this.x, this.y, this.r, this.color);
+            },
+            update: function () {
+                return;
+            },
+            toString: function () {
+                return this.name + &quot;{x: &quot; + this.x + &quot;, y: &quot; + this.y + &quot;, r: &quot; + this.r + &quot;, Color: &quot; + this.color + &quot;}&quot;;
+            }
+        });
+    }
+
+    /**
+     * Aktualisiert die Liste der gezeichneten Objekte
+     */
+    updateList() {
+        this.listSh.innerHTML = &quot;&quot;;
+        this.shapes.forEach(element =&gt; {
+            let tmp = document.createElement(&quot;li&quot;);
+            tmp.innerHTML = &quot;&lt;button onclick=&#039;delete c.shapes[&quot; + element.id + &quot;];c.updateList()&#039;&gt;Remove&lt;/button&gt;&quot; + element.toString();
+            this.listSh.appendChild(tmp);
+        });
+    }
+
+    /**
+     * Zeichnet alle Objekte auf das Canvas
+     */
+    draw() {
+        this.cls();
+        this.shapes.forEach(element =&gt; {
+            element.draw();
+        });
+    }
+
+    /**
+     * Die Funktion zeichnet einen Ausschnitt eines Bildes auf das Canvas
+     * @param {Image} img Das Bild aus dem der Ausschnitt kommen soll
+     * @param {number} ix Die x-Position des Bildabschnitts
+     * @param {number} iy Die y-Position des Bildabschnitts
+     * @param {number} iw Die Breite des bildabschnitts
+     * @param {number} ih Die Höhe des Bildabschnitts
+     * @param {number} x Die x-Position an der es gezeichnet werden soll
+     * @param {number} y Die y-position an der es gezeichnet werden soll
+     * @param {number} w Die Breite auf die es gestreckt werden soll
+     * @param {number} h Die Höhe auf die es gestreckt werden soll.
+     */
+    drawSprite(img, ix, iy, iw, ih, x, y, w, h) {
+        if (img instanceof HTMLImageElement &amp;&amp; img.complete === true)
+            this.ctx.drawImage(img, ix, iy, iw, ih, x, y, w, h);
+        else
+            this.fillRect(x, y, w, h, &quot;#cc33ff&quot;);
+    }
+
+    /**
+     * Zeichnet ein Bild aufs canvas
+     * @param {Image} image Das zu zeichnende Bild
+     * @param {number} x Die x-Position des Bilds
+     * @param {number} y Die y-Position des Bilds
+     * @param {number} w Die Breite des Bilds
+     * @param {number} h Die Höhe des Bilds
+     */
+    drawImage(image, x, y, w, h) {
+        if (image instanceof HTMLImageElement &amp;&amp; image.complete === true)
+            this.ctx.drawImage(image, x, y, w, h);
+        else
+            this.fillRect(x, y, w, h, &quot;#cc33ff&quot;);
+    }
+
+    /**
+     * Zeichnet die Zellen eines 2D Arrays auf das canvas
+     * @param {number[][]} arr Das 2D Array
+     * @param {string[]} colorArray Die Zahlen in den Zellen des 2D Arrays geben den Index für die Zellen mit der entsprechenden Farbe an
+     * @param {number} [w = Math.floor(canvas.width / arr[0].length)] Die Breite jeder Zelle
+     * @param {number} [h = Math.floor(canvas.height / arr.length)] Die Höhe jeder Zelle
+     * @param {number} [xOffset = 0] Offset in x-Richtung
+     * @param {number} [yOffset = 0] Offset in y-Richtung
+     */
+    fillArray2D(arr, colorArray, w = Math.floor(this.canvas.width / arr[0].length), h = Math.floor(this.canvas.height / arr.length), xOffset = 0, yOffset = 0) {
+        let abstand = 0;
+        for (let y = 0; y &lt; arr.length; y++) {
+            for (let x = 0; x &lt; arr[0].length; x++) {
+                this.fillRect(x * w + abstand + xOffset, y * h + abstand + yOffset, w - abstand, h - abstand, colorArray[arr[y][x]], abstand == 0 ? false : true);
+            }
+        }
+    }
+
+    /**
+     * Zeichnet die Zellen eines 1D Arrays auf das canvas
+     * @param {number[]} arr Das 1D Array
+     * @param {number} w Die Breite jeder Zelle
+     * @param {number} h Die Höhe jeder Zelle
+     * @param {number} x_ Offset in x-Richtung
+     * @param {number} y Offset in y-Richtung
+     */
+    render(arr, sx, sy, ex, ey, tw, th) {
+        const breite = ex - sx;
+        for (let y = sy; y &lt; ey; y++) {
+            for (let x = sx; x &lt; ex; x++) {
+                try {
+                    this.fillRect(x, y, tw, th, colorToRGB(arr[(y - sy) * breite + (x - sx)]));
+                } catch (e) {
+                    console.log(arr[(y - sy) * breite + (x - sx)]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Zeichnet die Zellen eines 2D Arrays auf das canvas
+     * @param {number[][]} arr Das 2D Array
+     * @param {Function} callback Die Farbe die genommen werden soll
+     * @param {number} [w = Math.floor(canvas.width / arr[0].length)] Die Breite jeder Zelle
+     * @param {number} [h = Math.floor(canvas.height / arr.length)] Die Höhe jeder Zelle
+     * @param {number} [xOffset = 0] Offset in x-Richtung
+     * @param {number} [yOffset = 0] Offset in y-Richtung
+     */
+    fillArrayCB(arr, callback, w = Math.floor(this.canvas.width / arr[0].length), h = Math.floor(this.canvas.height / arr.length), xOffset = 0, yOffset = 0) {
+        let abstand = 0;
+        for (let y = 0; y &lt; arr.length; y++) {
+            for (let x = 0; x &lt; arr[0].length; x++) {
+                this.fillRect(x * w + abstand + xOffset, y * h + abstand + yOffset, w - abstand, h - abstand, callback(arr[y][x]), abstand == 0 ? false : true);
+            }
+        }
+    }
+
+    /**
+     * Zeichnet die die Bilder in den Zellen eines 2D Arrays auf das canvas
+     * @param {Image[][]} arr Das 2D Array, dass die Bilder enthält
+     * @param {number} [w = Math.floor(canvas.width / arr[0].length)] Die Breite jeder Zelle
+     * @param {number} [h = Math.floor(canvas.height / arr.length)] Die Höhe jeder Zelle
+     * @param {number} [xOffset = 0] Offset in x-Richtung
+     * @param {number} [yOffset = 0] Offset in y-Richtung
+     */
+    imageArray(arr, w = Math.floor(this.canvas.width / arr[0].length), h = Math.floor(this.canvas.height / arr.length), xOffset = 0, yOffset = 0) {
+        for (let y = 0; y &lt; arr.length; y++) {
+            for (let x = 0; x &lt; arr[0].length; x++) {
+                this.drawImage(arr[y][x], x * w + xOffset, y * h + yOffset, w, h);
+            }
+        }
+    }
+
+    /**
+     * Schreibt einen Text aufs Canvas
+     * @param {number} x Die x-Position des Texts
+     * @param {number} y Die y-Position des Texts
+     * @param {string} string Der zu zeichnende Text
+     * @param {string} [font = &quot;30px Arial&quot;] Die zu benutzende Schriftart
+     * @param {string} [color = &quot;black&quot;] Die zu benutzende Farbe
+     */
+    fillText(x, y, string, font = &quot;30px Arial&quot;, color = &quot;white&quot;) {
+        this.ctx.font = font;
+        this.ctx.fillStyle = color;
+        this.ctx.fillText(string, x, y);
+    }
+
+    /**
+     * Zeichnet ein den Umriss eines Rechtecks auf das Canvas
+     * @param {number} x Die x-Position
+     * @param {number} y Die y-Position
+     * @param {number} w Die Breite
+     * @param {number} h Die Höhe
+     * @param {string} [color = &quot;black&quot;] Die Farbe der Umrandung
+     */
+    drawRect(x, y, w, h, color = &quot;black&quot;) {
+        this.ctx.strokeStyle = color;
+        this.ctx.strokeRect(x, y, w, h);
+    }
+
+    /**
+     * Zeichnet ein Rechteck auf das Canvas
+     * @param {number} x Die x-Position
+     * @param {number} y Die y-Position
+     * @param {number} w Die Breite
+     * @param {number} h Die Höhe
+     * @param {string} color Die Farbe der Umrandung
+     * @param {boolean} [border = false] Wenn wahr, wird eine Umrandung gezeichnet
+     * @param {string} [bColor = &quot;black&quot;] Gibt die Farbe für die umrandung an
+     */
+    fillRect(x, y, w, h, color, border = false, bColor = &quot;white&quot;) {
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(x, y, w, h);
+        this.ctx.strokeStyle = bColor;
+        if (border)
+            this.ctx.strokeRect(x, y, w, h);
+    }
+
+    /**
+     * Löscht alles was auf das Canvas gezeichnet wurde
+     */
+    cls() {
+        this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.height);
+    }
+
+    /**
+     * Die Methode zeichnet eine Linie auf das Canvas
+     * @param {number} x1 Die Startposition auf der x-Achse
+     * @param {number} y1 Die Startposition auf der y-Achse
+     * @param {number} x2 Die Endposition auf der x-Achse
+     * @param {number} y2 Die Endposition auf der y-Achse
+     * @param {string} [color=&quot;black&quot;] Die Farbe der Linie
+     * @example
+     * c.line(50,50,150,150,&quot;black&quot;);
+     */
+    line(x1, y1, x2, y2, color = &quot;black&quot;) {
+        this.ctx.beginPath(0, 0);
+        this.ctx.lineTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.strokeStyle = color;
+        this.ctx.stroke();
+    }
+
+
+    /**
+     * Zeichnet eine Linie durch eine Reihe von Punkten
+     * @param {number[][]} path Gibt die Punkte bei einem n Punkte langen Pfad in der Form [[x1,y1],[x2,y2],[xn,yn]] an
+     * @param {string} [color = &quot;black&quot;] Gibt die farbe für den pfad an
+     * @throws {InvalidPathLength} Wird geworfen, wenn der Pfad kürzer als zwei Punkte ist
+     */
+    drawPath(path, color = &quot;black&quot;) {
+        if (path.length &lt;= 1)
+            throw &quot;InvalidPathLength&quot;;
+        path.push([0, 0]);
+        let tmp = path.pop();
+        this.ctx.beginPath(tmp[0], tmp[1]);
+        for (let i = 1; i &lt; path.length; i++) {
+            this.ctx.lineTo(path[i][0], path[i][1]);
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.stroke();
+    }
+
+    /**
+     * Zeichnet einen Pfad durch eine Reihe von Punkten und schließt diesen am Ende
+     * @param {number[][]} path Gibt die Punkte bei einem n Punkte langen Pfad in der Form [[x1,y1],[x2,y2],[xn,yn]] an
+     * @param {string} [color = &quot;black&quot;] Gibt die farbe für den pfad an
+     * @throws {InvalidPathLength} Wird geworfen, wenn der Pfad kürzer als drei Punkte ist
+     */
+    drawShape(path, color = &quot;black&quot;) {
+        if (path.length &lt;= 2)
+            throw &quot;InvalidPathLength&quot;;
+        path.push([0, 0]);
+        let tmp = path.pop();
+        this.ctx.beginPath(tmp[0], tmp[1]);
+        while (path.length != 0) {
+            tmp = path.pop();
+            this.ctx.lineTo(tmp[0], tmp[1]);
+        }
+        this.ctx.strokeStyle = color;
+        this.ctx.closePath();
+        this.ctx.stroke();
+    }
+
+    /**
+     * Zeichnet einen Pfad durch eine Reihe von Punkten und schließt und füllt diesen am Ende
+     * @param {number[][]} path Gibt die Punkte bei einem n Punkte langen Pfad in der Form [[x1,y1],[x2,y2],[xn,yn]] an
+     * @param {string} [color = &quot;black&quot;] Gibt die farbe für den pfad an
+     * @param {boolean} [outline = &quot;false&quot;] Wenn wahr, wird der Umriss mit gezeichnet
+     * @param {string} [strokeColor = &quot;black&quot;] Gibt die farbe für die Umrandung an
+     * @throws {InvalidPathLength} Wird geworfen, wenn der Pfad kürzer als drei Punkte ist
+     */
+    fillShape(path, color = &quot;black&quot;, outline = false, strokeColor = &quot;black&quot;) {
+        if (path.length &lt;= 2)
+            throw &quot;InvalidPathLength&quot;;
+        path.push([0, 0]);
+        let tmp = path.pop();
+        this.ctx.beginPath(tmp[0], tmp[1]);
+        while (path.length != 0) {
+            tmp = path.pop();
+            this.ctx.lineTo(tmp[0], tmp[1]);
+        }
+        this.ctx.fillStyle = color;
+        this.ctx.strokeStyle = strokeColor;
+        this.ctx.closePath();
+        if (outline)
+            this.ctx.stroke();
+        this.ctx.fill();
+    }
+
+    /**
+     * Zeichnet den Umriss eines Kreises
+     * @param {number} x Gibt die Position des Kreises an
+     * @param {number} y Gibt die y-Position des Kreises an
+     * @param {number} r Gibt den radius des Kreises an
+     * @param {string} color Gibt die Farbe des Kreises an
+     */
+    drawCircle(x, y, r, color) {
+        this.ctx.strokeStyle = color;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r, 0, 2 * Math.PI);
+        this.ctx.stroke();
+    }
+
+    /**
+     * Zeichnet eine Kreises
+     * @param {number} x Gibt die Position des Kreises an
+     * @param {number} y Gibt die y-Position des Kreises an
+     * @param {number} r Gibt den radius des Kreises an
+     * @param {string} color Gibt die Farbe des Kreises an
+     * @param {boolean} [outline=false] Wenn wahr, wird der umriss gezeichnet
+     * @param {string} [outColor=&quot;blac&quot;] Gibt die Farbe der Umrandung an
+     */
+    fillCircle(x, y, r, color, outline = false, outColor = &quot;black&quot;) {
+        this.ctx.strokeStyle = outColor;
+        this.ctx.fillStyle = color
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r, 0, 2 * Math.PI);
+        this.ctx.fill();
+        if (outline)
+            this.ctx.stroke();
+        this.ctx.closePath();
+    }
+
+    /**
+     * Macht das Canvas unscharf
+     */
+    blur() {
+        let _c = document.getElementById(this.canvas.getAttribute(&quot;id&quot;));
+        let _ctx = _c.getContext(&quot;2d&quot;);
+        _ctx.globalAlpha = 0.3;
+        let _offset = 3;
+        for (let i = 1; i &lt;= 8; i += 1) {
+            _ctx.drawImage(_c, _offset, 0, _c.width - _offset, _c.height, 0, 0, _c.width - _offset, _c.height);
+            _ctx.drawImage(_c, 0, _offset, _c.width, _c.height - _offset, 0, 0, _c.width, _c.height - _offset);
+        }
+    }
+
+    /**
+     * Zeichnet ein Balkendiagramm mit den gegebenen Werten
+     * @param {number[]} arr Die Werte in einem Array
+     * @param {number} min Der kleinste Wert
+     * @param {number} max Der größte Wert
+     */
+    plot(arr, min, max) {
+        let tSize = this.width / arr.length;
+        for (let i = 0; i &lt; arr.length; i++) {
+            this.fillRect(i * tSize, this.height - mapValue(arr[i], min, max, 0, this.height), tSize, mapValue(arr[i], min, max, 0, this.height), &quot;white&quot;, true, &quot;black&quot;);
+        }
+    }
+
+    /**
+     * Gibt Text aus
+     * @param {string} str Der Text
+     * @param {string} color Die Textfarbe
+     */
+    alert(str, color) {
+        this.cls();
+        this.fillText(WIDTH / 4, HEIGHT / 2, str, &quot;50px Times New Roman&quot;, color);
+    }
+
+    /**
+     * Aktualisiert die Größe des Canvas
+     * @param {number} w Breite
+     * @param {number} h Höhe
+     */
+    resize(w, h) {
+        this.canvas.setAttribute(&quot;width&quot;, w);
+        this.canvas.setAttribute(&quot;height&quot;, h);
+    }
+
+
+    /**
+     * Die Funktion konvertiert ein Canvas zu einem Bild.
+     * @param {canvas} canvas Das zu konvertierende Canvas
+     * @return {Image} Das Bild
+     */
+    static convertCanvasToImage(canvas) {
+        var image = new Image();
+        image.src = canvas.toDataURL(&quot;image/png&quot;);
+        return image;
+    }
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
