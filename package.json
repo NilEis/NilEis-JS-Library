@@ -1,0 +1,27 @@
+{
+  "name": "js-libary",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "complexity-report": "^2.0.0-alpha",
+    "plato": "^1.7.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.6",
+    "jsdoc-to-markdown": "^6.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NilEis/JS-Libary.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NilEis/JS-Libary/issues"
+  },
+  "homepage": "https://github.com/NilEis/JS-Libary#readme"
+}
