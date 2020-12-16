@@ -5,3 +5,4 @@ JS/GPU/gpu-browser.min.js
 node_modules
 package-lock.json
 package.json
+Release/script.js
