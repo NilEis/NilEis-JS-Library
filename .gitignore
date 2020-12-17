@@ -3,3 +3,4 @@ closure-compiler-v20200719.jar
 JS/GPU/gpu-browser.min.js
 node_modules
 Release/script.js
+genDocs.cmd

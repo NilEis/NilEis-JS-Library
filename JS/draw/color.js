@@ -1,53 +1,127 @@
 /**
- * @file Stellt Funktionen für Farben zur verfügung
- * @module color.js
+ * @file Stellt die Klasse {@link Color} zur Verfügung
  */
-/**
- * Konvertiert das Array zu einem String, in der Form rgb(r,g,b)
- * @param {number[3]} arr Die Farbe
- * @returns {string} Die Farbe
- */
-function colorToRGB(arr) {
-    return "rgb(" + arr[0] + "," + arr[1] + "," + arr[2] + ")";
-}
+class Color {
+    /**
+     * Initialisiert das Objekt mit den gegebenen Farben
+     * @param {number} r Rot
+     * @param {number} g Grün
+     * @param {number} b Blau
+     * @param {number} [a=1.0] Alpha 
+     */
+    constructor(r, g, b, a = 1.0) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
 
-/**
- * Multipliziert eine Farbe mit einem Wert
- * @param {number[3]} rgb Die Farbe
- * @param {number} v Der Wert mit dem multipliziert wird
- * @returns {number[3]} Die Farbe
- */
-function mulRGB(rgb, v) {
-    return [clamp(rgb[0] * v, 0, 255), clamp(rgb[1] * v, 0, 255), clamp(rgb[2] * v, 0, 255)];
-}
+    }
 
-/**
- * Dividiert eine Farbe mit einem Wert
- * @param {number[3]} rgb Die Farbe
- * @param {number} v Der Wert mit dem dividiert wird
- * @returns {number[3]} Die Farbe
- */
-function divRGB(rgb, v) {
-    return [clamp(rgb[0] / v, 0, 255), clamp(rgb[1] / v, 0, 255), clamp(rgb[2] / v, 0, 255)];
-}
+    /**
+     * Gibt die Farbe als Hex Wert zurück
+     * @returns {string} Die Farbe
+     */
+    getHex() {
+        return "#" + ((1 << 24) + (this.r << 16) + (this.g << 8) + this.b).toString(16).slice(1);
+    }
 
-/**
- * Addiert zwei Farben
- * @param {number[3]} c1 Farbe1
- * @param {number[3]} c2 Farbe2
- * @returns {number[3]} Die Farbe
- */
-function addRGB(c1, c2) {
-    return [clamp(c1[0] + c2[0], 0, 255), clamp(c1[1] + c2[1], 0, 255), clamp(c1[2] + c2[2], 0, 255)];
-}
+    /**
+     * Gibt die Farbe als Integer zurück
+     * @returns {number} Die Farbe
+     */
+    getInt() {
+        return ((1 << 24) + (this.r << 16) + (this.g << 8) + this.b);
+    }
 
-/**
- * Mixt zwei Farben
- * @param {number[3]} rgb1 Farbe1
- * @param {number[3]} rgb2 Farbe2
- * @param {number} v 
- * @returns {number[3]} Die Farbe
- */
-function mixRGB(rgb1, rgb2, v) {
-    return addRGB(mulRGB(rgb1, (1 - v)), mulRGB(rgb2, v));
+    /**
+     * Addiert die Farbe mit einer anderen
+     * @param {Color} c Die zu addierende Farbe
+     */
+    add(c) {
+        this.r = clamp(this.r + c.r, 0, 255);
+        this.g = clamp(this.g + c.g, 0, 255);
+        this.b = clamp(this.b + c.b, 0, 255);
+    }
+
+    /**
+     * Zieht eine andere Farbe von der Farbe ab
+     * @param {Color} c Die abzuziehende Farbe
+     */
+    sub(c) {
+        this.r = clamp(this.r - c.r, 0, 255);
+        this.g = clamp(this.g - c.g, 0, 255);
+        this.b = clamp(this.b - c.b, 0, 255);
+    }
+    /**
+     * Multipliziert die Farbe mit einem Wert
+     * @param {number} v Der Wert mit dem multipliziert wird
+     */
+    mul(v) {
+        this.r = clamp(this.r * v, 0, 255);
+        this.g = clamp(this.g * v, 0, 255);
+        this.b = clamp(this.b * v, 0, 255);
+    }
+
+    /**
+     * Dividiert die Farbe mit einem Wert
+     * @param {number} v Der Wert durch den geteilt wird
+     */
+    div(v) {
+        this.r = clamp(this.r / v, 0, 255);
+        this.g = clamp(this.g / v, 0, 255);
+        this.b = clamp(this.b / v, 0, 255);
+    }
+
+    /**
+     * Addiert zwei Farben
+     * @param {Color} c1 Farbe 1
+     * @param {Color} c2 Farbe 2
+     * @returns {Color} Die neue Farbe
+     */
+    static add(c1, c2) {
+        return new Color(clamp(c1.r + c2.r, 0, 255), clamp(c1.g + c2.g, 0, 255), clamp(c1.b + c2.b, 0, 255), clamp(c1.a + c2.a, 0.0, 1.0));
+    }
+
+    /**
+     * Subtrahiert zwei Farben
+     * @param {Color} c1 Farbe 1
+     * @param {Color} c2 Farbe 2
+     * @returns {Color} Die neue Farbe
+     */
+    static add(c1, c2) {
+        return new Color(clamp(c1.r - c2.r, 0, 255), clamp(c1.g - c2.g, 0, 255), clamp(c1.b - c2.b, 0, 255));
+    }
+
+    /**
+     * Konvertiert RGB zu Hex
+     * @param {number} r Rot
+     * @param {number} g Grün
+     * @param {number} b Blau
+     */
+    static rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    /**
+     * Konvertiert eine Farbe im Hexadezimalformat zu RGB
+     * @param {string} hex Der Hex String
+     */
+    static hexToRgb(hex) {
+        const c = parseInt(hex, 16);
+        const r = (c >> 16) & 255;
+        const g = (c >> 8) & 255;
+        const b = c & 255;
+        return "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+    /**
+     * Vermischt zwei Farben um einen bestimmten Wert
+     * @param {Color} c1 Farbe 1
+     * @param {Color} c2 Farbe 2
+     * @param {number} v Mischfaktor
+     * @returns {Color} Die neue Farbe
+     */
+    static mix(c1, c2, v) {
+        return new Color((c1.r * (1 - v)) + (c2.r * v), (c1.g * (1 - v)) + (c2.g * v), (c1.b * (1 - v)) + (c2.b * v));
+    }
 }
